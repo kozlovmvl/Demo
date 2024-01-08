@@ -1,10 +1,11 @@
-from ninja import File, Form, Router
-from ninja.files import UploadedFile
+import logging
+from ninja import Form, Router
 from ninja.errors import AuthenticationError
 
-from .models import User
+from .models import User, City
 from .scheme import LoginOutSchema, LoginInputSchema, UserProfileSchema, UserInputSchema
 
+logger = logging.getLogger("debug")
 router = Router()
 
 @router.post("/login/", response=LoginOutSchema, auth=None)
@@ -22,13 +23,17 @@ def get_user(request):
 
 
 @router.post("/update/", response=UserProfileSchema)
-def update_user(request, data: Form[UserInputSchema], photo: File[UploadedFile]):
+def update_user(request, data: Form[UserInputSchema]):
     user = User.objects.get(id=request.auth["id"])
     for key, value in data.dict().items():
-        if value is not None:
-            setattr(user, key, value)
-    if photo:
-        user.photo = photo
+        if value:
+            match key:
+                case "country":
+                    setattr(user, key + "_id", value)
+                case "city":
+                    user.city.set(City.objects.filter(id__in=value))
+                case _:
+                    setattr(user, key, value)
     user.save()
     return user
     

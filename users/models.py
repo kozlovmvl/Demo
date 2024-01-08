@@ -10,6 +10,9 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=200)
     first_name = models.CharField(max_length=200)
     photo = models.FileField(upload_to="users/", blank=True)
+    country = models.ForeignKey(
+        "Country", on_delete=models.CASCADE, null=True, default=None, blank=True)
+    city = models.ManyToManyField("City", blank=True)
     token = models.TextField(blank=True)
     token_renewed = models.DateTimeField(default=None, null=True, blank=True)
 
@@ -24,3 +27,18 @@ class User(AbstractBaseUser):
         self.token_renewed = timezone.localtime()
         self.save(update_fields=["token", "token_renewed"])
         return encoded_token
+
+
+
+class Country(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name

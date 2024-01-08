@@ -1,6 +1,8 @@
+from typing import List
 from ninja import Schema
 
 from users.scheme import PostAuthorSchema
+
 
 
 class PostOutSchema(Schema):
@@ -8,6 +10,10 @@ class PostOutSchema(Schema):
     title: str
     text: str
     author: PostAuthorSchema
+
+
+class ListPostsResponse(Schema):
+    posts: List[PostOutSchema]
 
 
 class PostInputSchema(Schema):

@@ -1,15 +1,14 @@
-from typing import List
 from ninja import Router, Form
 from posts.models import Post
 
-from posts.scheme import PostOutSchema, PostInputSchema, ErrorSchema
+from posts.scheme import ListPostsResponse, PostOutSchema, PostInputSchema, ErrorSchema
 
 router = Router()
 
-@router.post("/list/", response=List[PostOutSchema])
+@router.post("/list/", response=ListPostsResponse)
 def list_posts(request):
     qs = Post.objects.order_by("id")
-    return list(qs)
+    return {"posts": qs}
 
 
 @router.post("/create/", response={"200": PostOutSchema, "400": ErrorSchema})
